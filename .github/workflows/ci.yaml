@@ -45,7 +45,7 @@ jobs:
           commenter_type: tflint
       
       - name: Run terraform fmt
-        run: terraform fmt -recursive -check || true
+        run: terraform fmt -recursive -check
 
       - name: Comment fmt Output
         uses: GetTerminus/terraform-pr-commenter@v3
@@ -56,7 +56,7 @@ jobs:
           commenter_type: fmt
 
       - name: Validate Terraform
-        run: terraform validate || true
+        run: terraform validate
 
       - name: Comment Validate Output
         uses: GetTerminus/terraform-pr-commenter@v3
@@ -117,7 +117,7 @@ jobs:
         run: terraform init
       
       - name: Terraform Plan
-        run: terraform plan -no-color > tfplan.txt
+        run: terraform plan -lock=false -input=false |& tee tfplan.txt
       
       - name: Comment Plan Output
         uses: GetTerminus/terraform-pr-commenter@v3
@@ -126,6 +126,7 @@ jobs:
         with:
           commenter_type: plan
           commenter_plan_path: tfplan.txt
+          commenter_exitcode: ${{ steps.plan.outputs.exit }}
 
   build-artifacts:
     runs-on: ubuntu-latest
