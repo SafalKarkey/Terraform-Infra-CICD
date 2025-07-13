@@ -190,6 +190,12 @@ jobs:
           repo_token: "${{ secrets.MY_PAT_SECRET }}"
           automatic_release_tag: ${{ steps.get-version.outputs.new_version }}
           files: terraform-artifact.zip
+          
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-artifact.zip
+          path: terraform-artifact.zip
 
       - name: Debug artifact release
         run: |
