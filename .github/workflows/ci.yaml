@@ -15,9 +15,9 @@ jobs:
       - name: Set up AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws_region: us-east-1
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
@@ -39,6 +39,8 @@ jobs:
       - name: Comment tflint output
         uses: GetTerminus/terraform-pr-commenter@v3
         if: failure()
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         with:
           commenter_type: tflint
       
@@ -48,6 +50,8 @@ jobs:
       - name: Comment fmt Output
         uses: GetTerminus/terraform-pr-commenter@v3
         if: failure()
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         with:
           commenter_type: fmt
 
@@ -57,6 +61,8 @@ jobs:
       - name: Comment Validate Output
         uses: GetTerminus/terraform-pr-commenter@v3
         if: failure()
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         with:
           commenter_type: validate
 
@@ -69,9 +75,9 @@ jobs:
       - name: Set up AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws_region: us-east-1
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
@@ -93,9 +99,9 @@ jobs:
       - name: Set up AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws_region: us-east-1
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
       
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
