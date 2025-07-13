@@ -31,6 +31,8 @@ jobs:
           workflow: ci.yaml
           # name: terraform-artifact.zip
 
+      - uses: actions/checkout@v4
+
       - name: Get latest tag
         id: get-version
         run: |
@@ -43,7 +45,7 @@ jobs:
         with:
           repo: ${{ github.repository }}
           version: 'tags/${{ steps.get-version.outputs.last_version }}'
-          file: terraform-release.zip
+          file: terraform-artifact.zip
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract zipped artifact
