@@ -1,0 +1,1 @@
+## Terraform workflow that launches an EC2 instance

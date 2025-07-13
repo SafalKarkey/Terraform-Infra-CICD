@@ -1,0 +1,177 @@
+name: Terraform CI Workflow
+
+on:
+ pull_request:
+    branches:
+      - main
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_region: us-east-1
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Configure tflint
+        uses: terraform-linters/setup-tflint@v4
+
+      - name: Initialize Terraform
+        run: terraform init
+      
+      - name: Initialize tflint
+        run: tflint --init
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      
+      - name: Run tflint
+        run: tflint -f compact
+      
+      - name: Comment tflint output
+        uses: GetTerminus/terraform-pr-commenter@v3
+        if: failure()
+        with:
+          commenter_type: tflint
+      
+      - name: Run terraform fmt
+        run: terraform fmt -recursive -check || true
+
+      - name: Comment fmt Output
+        uses: GetTerminus/terraform-pr-commenter@v3
+        if: failure()
+        with:
+          commenter_type: fmt
+
+      - name: Validate Terraform
+        run: terraform validate || true
+
+      - name: Comment Validate Output
+        uses: GetTerminus/terraform-pr-commenter@v3
+        if: failure()
+        with:
+          commenter_type: validate
+
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_region: us-east-1
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Initialize Terraform
+        run: terraform init
+
+      - name: Run tfsec
+        uses: aquasecurity/tfsec-pr-commenter-action@v1.3.1
+
+  plan:
+    runs-on: ubuntu-latest
+    needs: [lint, security-scan]
+    steps: 
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_region: us-east-1
+      
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+      
+      - name: Initialize Terraform
+        run: terraform init
+      
+      - name: Terraform Plan
+        run: terraform plan -no-color > tfplan.txt
+      
+      - name: Comment Plan Output
+        uses: GetTerminus/terraform-pr-commenter@v3
+        with:
+          commenter_type: plan
+          commenter_plan_path: tfplan.txt
+
+  build-artifacts:
+    runs-on: ubuntu-latest
+    needs: plan
+    outputs:
+      new_version: ${{ steps.get-version.outputs.new_version }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Gemerate zip file 
+        run: |
+          sudo apt install -y zip
+          zip -r terraform-artifact.zip . -x "*.git*" "*.github*"
+      
+      - name: Setup semver tool
+        run: |
+          wget -O /usr/local/bin/semver \
+          https://raw.githubusercontent.com/fsaintjacques/semver-tool/master/src/semver
+          chmod +x /usr/local/bin/semver
+          semver --version
+
+
+      - name: Get version
+        id: get-version
+        run: |
+          git fetch --tags
+          last_version=$(git tag --sort=version:refname | tail -n 1)
+
+          if [ -z "$last_version" ]; then
+            new_version="1.0.0"
+          elif [[ ${{ github.head_ref }} =~ ^"major" ]]; then
+            new_version=$(semver bump major "$last_version")
+          elif [[ ${{ github.head_ref }} =~ ^"minor" ]]; then
+            new_version=$(semver bump minor "$last_version")
+          else
+            new_version=$(semver bump patch "$last_version")
+          fi
+
+          echo "new_version=$new_version" >> $GITHUB_OUTPUT
+        
+      - name: Push tag
+        uses: mathieudutour/github-tag-action@v6
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          custom_tag: ${{ steps.get-version.outputs.new_version }}
+      
+      - name: Create release in github
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: ${{ steps.get-version.outputs.new_version }}
+          files: terraform-artifact.zip
+
+      - name: Comment pushed tag
+        uses: mshick/add-pr-comment@v2
+        with:
+          message: "New version created: ${{ steps.get-version.outputs.new_version }}"
+
+      
+
+    
+
+
