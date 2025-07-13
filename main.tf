@@ -9,7 +9,7 @@ terraform {
 
   backend "s3" {
     bucket       = "com.safal-lf-terraform-state-bucket"
-    key          = "project1/terraform.tfstate"
+    key          = "gitops/terraform.tfstate"
     region       = "us-east-1"
     use_lockfile = true
   }
