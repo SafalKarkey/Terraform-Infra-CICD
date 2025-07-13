@@ -5,10 +5,12 @@ on:
     inputs:
       environment:
         description: 'Which environment to deploy to?'
-        required: true
+        required: false
 
 jobs:
   deploy:
+    environment:
+      name: ${{ github.ref_name == 'main' && 'prod' || github.ref_name == 'dev' && 'dev' || 'preview' }}
     runs-on: ubuntu-latest
     outputs:
       last_version: ${{ steps.get-version.outputs.last_version }}
@@ -17,7 +19,7 @@ jobs:
       pull-requests: write
     steps:
       - name: Print environment
-        run: echo "Deploying to ${{ github.event.inputs.environment }}"
+        run: echo "Deploying to ${{ github.ref_name }} branch with environment ${{ github.ref_name == 'main' && 'prod' || github.ref_name == 'dev' && 'dev' || 'preview' }}"
 
       - name: Set up AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -60,4 +62,4 @@ jobs:
       - run: |
           terraform init
           terraform plan
-          terraform apply -auto-approve -var="environment=${{ github.event.inputs.environment }}"
+          terraform apply -auto-approve -var="environment=${{ github.ref_name == 'main' && 'prod' || github.ref_name == 'dev' && 'dev' || 'preview' }}"
