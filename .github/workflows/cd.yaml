@@ -27,7 +27,7 @@ jobs:
         with:
           github_token: ${{secrets.MY_PAT_SECRET}}
           workflow: ci.yaml
-          name: terraform-artifact.zip
+          # name: terraform-artifact.zip
 
       - name: Create Release
         uses: dsaltares/fetch-gh-release-asset@master
