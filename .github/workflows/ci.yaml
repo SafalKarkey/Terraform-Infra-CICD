@@ -175,7 +175,7 @@ jobs:
           echo "new_version=$new_version" >> $GITHUB_OUTPUT
         
       - name: Push tag
-        uses: mathieudutour/github-tag-action@v6
+        uses: mathieudutour/github-tag-action@v6.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           custom_tag: ${{ steps.get-version.outputs.new_version }}
