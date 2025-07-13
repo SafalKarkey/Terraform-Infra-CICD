@@ -44,7 +44,7 @@ resource "aws_security_group" "secgrp" {
   description = "secgrp_for_ec2"
   vpc_id      = data.aws_vpc.safal-vpc.id
 
-  tags = merge(local.common-tags, { Name : "${local.name-prefix}-secgrp" })
+  tags = merge(local.common-tags, { Name : "${local.name_prefix}-secgrp" })
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ssh_rule" {
@@ -84,7 +84,7 @@ provider "aws" {
 # Creation of IAM role
 
 resource "aws_iam_role" "ec2_s3_role" {
-  name = "${local.name-prefix}ec2-s3-role"
+  name = "${local.name_prefix}-ec2-s3-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -99,14 +99,14 @@ resource "aws_iam_role" "ec2_s3_role" {
     ]
   })
 
-  tags = merge(local.common-tags, { Name : "${local.name-prefix}ec2-s3-role" })
+  tags = merge(local.common-tags, { Name : "${local.name_prefix}-ec2-s3-role" })
 }
 
 resource "aws_iam_instance_profile" "ec2_profile" {
-  name = "${local.name-prefix}ec2-profile"
+  name = "${local.name_prefix}-ec2-profile"
   role = aws_iam_role.ec2_s3_role.name
 
-  tags = merge(local.common-tags, { Name : "${local.name-prefix}ec2-profile" })
+  tags = merge(local.common-tags, { Name : "${local.name_prefix}-ec2-profile" })
 }
 
 # Creation of AWS instance
@@ -121,7 +121,7 @@ resource "aws_instance" "myinstance" {
   key_name               = "safal-encryption-key"
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.name
 
-  tags = merge(local.common-tags, { Name : "${local.name-prefix}EC2" })
+  tags = merge(local.common-tags, { Name : "${local.name_prefix}-EC2" })
 }
 
 output "ec2_arn" {
@@ -137,10 +137,10 @@ output "ec2_role_arn" {
 # Creation of bucket
 
 resource "aws_s3_bucket" "mybucket" {
-  bucket        = "com.safal-lf-bucket"
+  bucket        = local.selected_config.bucket_name
   force_destroy = true
 
-  tags = merge(local.common-tags, { Name : "${local.name-prefix}-tf-bucket" })
+  tags = merge(local.common-tags, { Name : "${local.name_prefix}-tf-bucket" })
 }
 
 resource "aws_s3_bucket_versioning" "versioning_safal" {
