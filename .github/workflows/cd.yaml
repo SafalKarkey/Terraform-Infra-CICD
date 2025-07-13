@@ -79,6 +79,6 @@ jobs:
           fi
       
 
-          terraform init
+          terraform init -migrate-state
           terraform plan
           terraform apply -auto-approve
