@@ -40,7 +40,7 @@ data "aws_subnet" "safal-subnet" {
 }
 
 resource "aws_security_group" "secgrp" {
-  name        = "my_secgrp"
+  name        = "${local.name_prefix}-my_secgrp"
   description = "secgrp_for_ec2"
   vpc_id      = data.aws_vpc.safal-vpc.id
 

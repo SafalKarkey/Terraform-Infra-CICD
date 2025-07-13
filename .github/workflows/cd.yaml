@@ -21,6 +21,7 @@ jobs:
       - name: Print environment
         run: echo "Deploying to ${{ github.ref_name }} branch with environment ${{ github.ref_name == 'main' && 'prod' || github.ref_name == 'dev' && 'dev' || 'preview' }}"
 
+
       - name: Set up AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -60,6 +61,24 @@ jobs:
       - uses: hashicorp/setup-terraform@v3
         
       - run: |
+          BRANCH_NAME="${{ github.ref_name }}"
+          if [[ "$BRANCH_NAME" == "main" ]]; then
+            WORKSPACE="prod"
+          elif [[ "$BRANCH_NAME" == "dev" ]]; then
+            WORKSPACE="dev"
+          else
+            WORKSPACE="default"
+          fi
+
+          echo "Selected Terraform workspace: $WORKSPACE"
+
+          if terraform workspace list | grep -qw "$WORKSPACE"; then
+            terraform workspace select "$WORKSPACE"
+          else
+            terraform workspace new "$WORKSPACE"
+          fi
+      
+
           terraform init
           terraform plan
-          terraform apply -auto-approve -var="environment=${{ github.ref_name == 'main' && 'prod' || github.ref_name == 'dev' && 'dev' || 'preview' }}"
+          terraform apply -auto-approve
