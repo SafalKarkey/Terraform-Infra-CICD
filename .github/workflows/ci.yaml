@@ -184,11 +184,16 @@ jobs:
           custom_tag: ${{ steps.get-version.outputs.new_version }}
       
       - name: Create release in github
+        id: create-release
         uses: marvinpinto/action-automatic-releases@latest
         with:
           repo_token: "${{ secrets.MY_PAT_SECRET }}"
           automatic_release_tag: ${{ steps.get-version.outputs.new_version }}
           files: terraform-artifact.zip
+
+      - name: Debug artifact release
+        run: |
+          echo "Release URL: ${{ steps.create-release.outputs.upload_url }}"
 
       - name: Comment pushed tag
         uses: mshick/add-pr-comment@v2
