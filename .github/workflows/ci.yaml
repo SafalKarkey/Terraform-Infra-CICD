@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -31,7 +31,7 @@ jobs:
       - name: Initialize tflint
         run: tflint --init
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Run tflint
         run: tflint -f compact
@@ -40,7 +40,7 @@ jobs:
         uses: GetTerminus/terraform-pr-commenter@v3
         if: failure()
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           commenter_type: tflint
       
@@ -51,7 +51,7 @@ jobs:
         uses: GetTerminus/terraform-pr-commenter@v3
         if: failure()
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           commenter_type: fmt
 
@@ -62,15 +62,18 @@ jobs:
         uses: GetTerminus/terraform-pr-commenter@v3
         if: failure()
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           commenter_type: validate
 
   security-scan:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -97,7 +100,7 @@ jobs:
     needs: [lint, security-scan]
     steps: 
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       
 
       - name: Set up AWS credentials
@@ -129,7 +132,7 @@ jobs:
       new_version: ${{ steps.get-version.outputs.new_version }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       
       - name: Gemerate zip file 
         run: |
