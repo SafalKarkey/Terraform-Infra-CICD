@@ -37,7 +37,7 @@ jobs:
         id: get-version
         run: |
           git fetch --tags
-          last_version=$(git tag --sort=version:refname | tail -n 1)
+          last_version=$(git tag --sort=version:refname | grep -v '^v' | tail -n 1)
           echo "last_version=$last_version" >> $GITHUB_OUTPUT
 
       - name: Create Release
