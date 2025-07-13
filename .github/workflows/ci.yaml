@@ -137,6 +137,9 @@ jobs:
   build-artifacts:
     runs-on: ubuntu-latest
     needs: plan
+    permissions:
+      contents: write
+      pull-requests: write
     outputs:
       new_version: ${{ steps.get-version.outputs.new_version }}
     steps:
