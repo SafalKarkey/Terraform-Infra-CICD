@@ -22,7 +22,7 @@ jobs:
       - name: Download artifact
         uses: dawidd6/action-download-artifact@v11
         with:
-          github_token: ${{secrets.GITHUB_TOKEN}}
+          github_token: ${{secrets.MY_PAT_SECRET}}
           workflow: ci.yaml
           name: terraform-artifact.zip
 
