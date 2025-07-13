@@ -120,7 +120,7 @@ resource "aws_instance" "myinstance" {
   key_name               = "safal-encryption-key"
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.name
 
-  tags = merge(local.common-tags, {Name: "${local.name-prefix}-EC2"})
+  tags = merge(local.common-tags, {Name: "${local.name-prefix}EC2"})
 }
 
 output "ec2_arn" {
