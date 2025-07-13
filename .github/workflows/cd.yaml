@@ -72,6 +72,8 @@ jobs:
 
           echo "Selected Terraform workspace: $WORKSPACE"
 
+          terraform init -migrate-state
+
           if terraform workspace list | grep -qw "$WORKSPACE"; then
             terraform workspace select "$WORKSPACE"
           else
@@ -79,6 +81,6 @@ jobs:
           fi
       
 
-          terraform init -migrate-state
+          
           terraform plan
           terraform apply -auto-approve
