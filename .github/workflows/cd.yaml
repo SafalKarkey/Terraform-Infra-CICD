@@ -11,6 +11,8 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    outputs:
+      last_version: ${{ steps.get-version.outputs.last_version }}
     permissions:
       contents: read
       pull-requests: write
@@ -29,10 +31,18 @@ jobs:
           workflow: ci.yaml
           # name: terraform-artifact.zip
 
+      - name: Get latest tag
+        id: get-version
+        run: |
+          git fetch --tags
+          last_version=$(git tag --sort=version:refname | tail -n 1)
+          echo "last_version=$last_version" >> $GITHUB_OUTPUT
+
       - name: Create Release
         uses: dsaltares/fetch-gh-release-asset@master
         with:
           repo: ${{ github.repository }}
+          version: 'tags/${{ steps.get-version.outputs.last_version }}'
           file: terraform-release.zip
           token: ${{ secrets.GITHUB_TOKEN }}
 
