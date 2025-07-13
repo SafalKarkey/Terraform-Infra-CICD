@@ -87,8 +87,9 @@ jobs:
 
       - name: Run tfsec
         uses: aquasecurity/tfsec-pr-commenter-action@v1.3.1
-        env:
-          INPUT_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
 
 
   plan:
