@@ -117,6 +117,7 @@ jobs:
         run: terraform init
       
       - name: Terraform Plan
+        id: plan
         run: terraform plan -lock=false -input=false |& tee tfplan.txt
       
       - name: Comment Plan Output
