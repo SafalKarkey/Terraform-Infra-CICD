@@ -121,6 +121,8 @@ jobs:
       
       - name: Comment Plan Output
         uses: GetTerminus/terraform-pr-commenter@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           commenter_type: plan
           commenter_plan_path: tfplan.txt
