@@ -98,9 +98,6 @@ jobs:
   plan:
     runs-on: ubuntu-latest
     needs: [lint, security-scan]
-    plan:
-    runs-on: ubuntu-latest
-    needs: [lint, security-scan]
     permissions:
       pull-requests: write
       contents: read
